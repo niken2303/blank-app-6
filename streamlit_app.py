@@ -1,119 +1,161 @@
 import pandas as pd
 import streamlit as st
 
-# 1. Konfigurasi Halaman & Tema Dasar
+# ==============================================================================
+# 1. KONFIGURASI HALAMAN & TEMA (STYLING)
+# ==============================================================================
+# Mengatur halaman agar melebar penuh (wide mode) untuk memuat 18 kolom golongan
 st.set_page_config(
-    page_title="Tabel Periodik Modern", page_icon="🧪", layout="wide"
+    page_title="Tabel Periodik Unsur", page_icon="🧪", layout="wide"
 )
 
-st.title("🧪 Tabel Periodik Unsur (Native Streamlit)")
-st.write(
-    "Dibuat menggunakan layouting kolom bawaan dokumentasi resmi Streamlit."
-)
-
-# Kustomisasi CSS agar tampilan tombol elemen berbentuk kotak presisi dan estetik
+# Kustomisasi CSS lewat Markdown untuk mengubah tombol default menjadi kotak presisi
 st.markdown(
     """
     <style>
+    /* Mengubah tombol elemen menjadi bentuk kotak seragam */
     div.stButton > button {
         width: 100%;
-        height: 60px;
+        height: 65px;
         padding: 0px;
         font-weight: bold;
-        font-size: 14px;
-        border-radius: 5px;
+        font-size: 13px;
+        border-radius: 6px;
+        border: 1px solid #4a4a4a;
+        line-height: 1.2;
+        background-color: #262730;
+        color: #ffffff;
+        transition: all 0.2s ease-in-out;
     }
-    /* Warna pembeda untuk informasi detail */
+    
+    /* Efek saat kursor diarahkan ke tombol */
+    div.stButton > button:hover {
+        border-color: #FF4B4B;
+        color: #FF4B4B;
+        transform: scale(1.05);
+    }
+
+    /* Kotak informasi detail elemen di bagian bawah */
     .element-box {
         padding: 20px;
         border-radius: 10px;
-        background-color: #262730;
+        background-color: #1e1e24;
         border-left: 5px solid #FF4B4B;
+        margin-bottom: 20px;
     }
     </style>
 """,
-    unsafe_allow_allowed=True,
-    # Jika versi streamlit kamu terbaru, gunakan parameter dasar:
     unsafe_allow_html=True,
 )
 
+st.title("🧪 Tabel Periodik Unsur Interaktif")
+st.write(
+    "Klik pada kotak elemen untuk melihat informasi detail dan karakteristik kimianya di panel bawah."
+)
+st.markdown("---")
 
-# 2. Mengambil Data Unsur (Dataset Publik Resmi)
+# ==============================================================================
+# 2. MEMUAT DATA DATABASE UNSUR (CACHED)
+# ==============================================================================
+# Fungsi di-cache agar data tidak di-download ulang setiap kali tombol diklik
 @st.cache_data
 def load_periodic_data():
+    # Mengambil database resmi 118 elemen dalam format CSV dari repositori publik
     url = "https://gist.github.com/GoodmanSciences/c2c7c06f5b8734b1e994/raw/23304cc5f2ea8b8466e3bfd41d176319213ef301/Periodic%2520Table%2520of%2520Elements.csv"
     return pd.read_csv(url)
 
 
+# Menyimpan data ke dalam variabel DataFrame (df)
 df = load_periodic_data()
 
-# Inisialisasi state untuk menyimpan elemen yang sedang diklik (fitur interaktif dokumentasi)
+# Inisialisasi memori jangka pendek (session_state) untuk menyimpan elemen terpilih
 if "selected_element" not in st.session_state:
     st.session_state.selected_element = (
-        "Hydrogen"  # Elemen default saat pertama dibuka
+        "Hydrogen"  # Elemen default saat pertama kali dibuka
     )
 
-# 3. Membuat Grid Tabel Periodik (18 Kolom Sesuai Golongan)
-# Sesuai standard dokumentasi, kita bungkus di dalam container utama
+# ==============================================================================
+# 3. MERENDER GRID TABEL PERIODIK (18 KOLOM)
+# ==============================================================================
 with st.container():
-    # Membuat 18 kolom horizontal
+    # Membuat 18 kolom vertikal sesuai jumlah golongan tabel periodik
     cols = st.columns(18)
 
-    # Lakukan perulangan untuk setiap Periode (Baris 1 sampai 7)
+    # Perulangan untuk mengecek Baris/Periode (1 sampai 7)
     for period in range(1, 8):
-        # Ambil data unsur yang ada di periode ini
+        # Memfilter data yang hanya berada di periode aktif saat ini
         current_period_df = df[df["Period"] == period]
 
-        # Cek setiap Golongan (Kolom 1 sampai 18)
+        # Perulangan untuk mengecek Kolom/Golongan (1 sampai 18)
         for group in range(1, 19):
-            # Cari apakah ada unsur di koordinat Baris & Kolom ini
+            # Mencari apakah ada unsur kimia di koordinat Periode & Golongan ini
             element_row = current_period_df[current_period_df["Group"] == group]
 
-            with cols[group - 1]:  # Index kolom Python dimulai dari 0
+            # Mengaktifkan kolom tujuan (Python menggunakan indeks berbasis 0, maka group - 1)
+            with cols[group - 1]:
                 if not element_row.empty:
-                    # Jika unsur ditemukan, ambil datanya
+                    # Ambil data spesifik unsur jika ditemukan
                     sym = element_row.iloc[0]["Symbol"]
                     num = element_row.iloc[0]["AtomicNumber"]
                     name = element_row.iloc[0]["Element"]
 
-                    # Tampilkan tombol pembentuk kotak tabel periodik
-                    # Menggunakan st.session_state untuk menangkap aksi klik
+                    # Tampilkan tombol kotak elemen. \n digunakan untuk membuat baris baru di dalam tombol.
                     if st.button(f"{num}\n{sym}", key=f"btn_{sym}"):
+                        # Jika diklik, update nama elemen di dalam memori aplikasi
                         st.session_state.selected_element = name
                 else:
-                    # Jika kosong (seperti celah di antara Hidrogen dan Helium), tampilkan teks kosong agar layout rapi
+                    # Jika tidak ada unsur di koordinat tersebut, biarkan kosong agar spasi layout tetap rapi
                     st.write("")
 
-# 4. Panel Informasi Detail (Tampil di bagian bawah tabel)
 st.markdown("---")
-st.header("🔍 Detail Informasi Unsur")
 
-# Mengambil data dari elemen yang sedang aktif di session_state
+# ==============================================================================
+# 4. PANEL INFORMASI DETAIL UNSUR YANG TERPILIH
+# ==============================================================================
+st.header("🔍 Detail Karakteristik Unsur")
+
+# Mengambil data dari elemen yang namanya sedang tersimpan di memori (session_state)
 selected_name = st.session_state.selected_element
 element_info = df[df["Element"] == selected_name].iloc[0]
 
-# Tampilan Card Detail menggunakan HTML+CSS di Streamlit
+# Menampilkan Banner Nama Unsur dengan gaya CSS kustom
 st.markdown(
     f"""
     <div class="element-box">
-        <h2>{element_info['Element']} ({element_info['Symbol']})</h2>
-        <p><b>Kategori Unsur:</b> {element_info['Type']} | <b>Fase Wujud:</b> {element_info['Phase']}</p>
+        <h2 style='margin:0; color:#FF4B4B;'>{element_info['Element']} ({element_info['Symbol']})</h2>
+        <p style='margin:5px 0 0 0; opacity:0.8;'><b>Kategori:</b> {element_info['Type']} | <b>Wujud Zat (STP):</b> {element_info['Phase']}</p>
     </div>
 """,
     unsafe_allow_html=True,
 )
 
-# Menampilkan statistik angka menggunakan komponen st.metric bawaan Streamlit
-col1, col2, col3, col4 = st.columns(4)
-with col1:
+# Membagi informasi angka/metrik utama menjadi 4 kolom berjejer
+m_col1, m_col2, m_col3, m_col4 = st.columns(4)
+with m_col1:
     st.metric(label="Nomor Atom", value=int(element_info["AtomicNumber"]))
-with col2:
+with m_col2:
     st.metric(label="Massa Atom", value=f"{element_info['AtomicMass']} u")
-with col3:
-    st.metric(label="Periode", value=int(element_info["Period"]))
-with col4:
-    st.metric(label="Golongan", value=int(element_info["Group"]))
+with m_col3:
+    st.metric(label="Golongan (Group)", value=int(element_info["Group"]))
+with m_col4:
+    st.metric(label="Periode (Period)", value=int(element_info["Period"]))
 
-# Detail Tambahan teks menggunakan st.help atau st.code untuk konfigurasi elektron
+# Menampilkan informasi detail sekunder di bagian paling bawah
+st.markdown("### 🧬 Informasi Tambahan")
+info_col1, info_col2 = st.columns(2)
+
+with info_col1:
+    st.write(f"**Radius Atom:** {element_info['AtomicRadius']} Å")
+    st.write(f"**Elektronegativitas:** {element_info['Electronegativity']}")
+    st.write(f"**Titik Leleh:** {element_info['MeltingPoint']} K")
+
+with info_col2:
+    st.write(f"**Titik Didih:** {element_info['BoilingPoint']} K")
+    st.write(f"**Kepadatan (Density):** {element_info['Density']} g/cm³")
+    st.write(f"**Tahun Ditemukan:** {element_info['YearIntroduced']}")
+
+# Menampilkan konfigurasi elektron dengan format box code komputer
+st.write("**Konfigurasi Elektron:**")
+st.code(element_info["ElectronConfiguration"], language="bash")
 st.subheader("Konfigurasi Elektron")
 st.code(element_info["ElectronConfiguration"], language="bash")
