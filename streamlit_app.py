@@ -2,103 +2,107 @@ import pandas as pd
 import streamlit as st
 
 # ==============================================================================
-# 1. KONFIGURASI HALAMAN & TEMA (STYLING)
+# 1. KONFIGURASI HALAMAN & TEMA LUCU (CSS CUSTOM)
 # ==============================================================================
 st.set_page_config(
-    page_title="Tabel Periodik Unsur", page_icon="🧪", layout="wide"
+    page_title="Tabel Periodik Gemas", page_icon="🎨", layout="wide"
 )
 
-# Kustomisasi CSS lewat Markdown untuk merapikan tampilan tombol elemen
+# CSS untuk mengubah font, bentuk tombol bulat (rounded), dan efek hover yang halus
 st.markdown(
     """
     <style>
+    /* Mengubah Font global aplikasi menjadi lebih ramah/playful */
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap');
+    
+    html, body, [data-testid="stWidgetLabel"] {
+        font-family: 'Fredoka', sans-serif !important;
+    }
+    
+    /* Mengatur style tombol unsur */
     div.stButton > button {
         width: 100%;
-        height: 65px;
-        padding: 0px;
-        font-weight: bold;
-        font-size: 13px;
-        border-radius: 6px;
-        border: 1px solid #4a4a4a;
-        line-height: 1.2;
-        background-color: #262730;
-        color: #ffffff;
+        height: 70px;
+        padding: 5px;
+        font-family: 'Fredoka', sans-serif;
+        font-weight: 600;
+        font-size: 14px;
+        border-radius: 12px; /* Membuat sudut kotak lebih bulat/tumpul lucu */
+        border: None;
+        line-height: 1.3;
+        color: #2F3E46; /* Warna teks gelap lembut */
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.05);
         transition: all 0.2s ease-in-out;
     }
     
+    /* Efek gemas saat kursor menempel di kotak */
     div.stButton > button:hover {
-        border-color: #FF4B4B;
-        color: #FF4B4B;
-        transform: scale(1.05);
+        transform: translateY(-4px) scale(1.05);
+        box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
     }
 
-    .element-box {
-        padding: 20px;
-        border-radius: 10px;
-        background-color: #1e1e24;
-        border-left: 5px solid #FF4B4B;
+    /* Kotak informasi detail di bawah */
+    .detail-card {
+        padding: 25px;
+        border-radius: 20px;
+        background-color: #F8F9FA;
+        border: 2px dashed #E9ECEF;
         margin-bottom: 20px;
+        box-shadow: inset 0px 2px 4px rgba(0,0,0,0.02);
     }
     </style>
 """,
     unsafe_allow_html=True,
 )
 
-st.title("🧪 Tabel Periodik Unsur Interaktif")
-st.write(
-    "Klik pada kotak elemen untuk melihat informasi detail dan karakteristik kimianya di panel bawah."
-)
+st.title("🎨 Tabel Periodik Pop-Pastel")
+st.write("Klik kotak unsur yang lucu di bawah untuk mengintip rahasia kimianya!")
 st.markdown("---")
 
-
 # ==============================================================================
-# 2. DATA LOKAL (MANDIRI & BEBAS HTTP ERROR)
+# 2. DATABASE LOKAL + WARNA PASTEL & EMOJI
 # ==============================================================================
 @st.cache_data
-def load_local_data():
-    # Memasukkan data langsung agar aplikasi tidak bergantung pada internet/URL eksternal
+def load_cute_data():
     raw_data = [
         # Periode 1
-        {"AtomicNumber": 1, "Symbol": "H", "Element": "Hydrogen", "AtomicMass": "1.008", "Period": 1, "Group": 1, "Type": "Reactive Nonmetal", "Phase": "Gas", "ElectronConfiguration": "1s¹"},
-        {"AtomicNumber": 2, "Symbol": "He", "Element": "Helium", "AtomicMass": "4.0026", "Period": 1, "Group": 18, "Type": "Noble Gas", "Phase": "Gas", "ElectronConfiguration": "1s²"},
+        {"AtomicNumber": 1, "Symbol": "H", "Element": "Hydrogen", "AtomicMass": "1.008", "Period": 1, "Group": 1, "Type": "Nonmetal", "Phase": "Gas", "Color": "#FFADAD", "Emoji": "🎈"},
+        {"AtomicNumber": 2, "Symbol": "He", "Element": "Helium", "AtomicMass": "4.0026", "Period": 1, "Group": 18, "Type": "Noble Gas", "Phase": "Gas", "Color": "#E8AEFF", "Emoji": "🎈"},
         # Periode 2
-        {"AtomicNumber": 3, "Symbol": "Li", "Element": "Lithium", "AtomicMass": "6.94", "Period": 2, "Group": 1, "Type": "Alkali Metal", "Phase": "Solid", "ElectronConfiguration": "[He] 2s¹"},
-        {"AtomicNumber": 4, "Symbol": "Be", "Element": "Beryllium", "AtomicMass": "9.0122", "Period": 2, "Group": 2, "Type": "Alkaline Earth Metal", "Phase": "Solid", "ElectronConfiguration": "[He] 2s²"},
-        {"AtomicNumber": 5, "Symbol": "B", "Element": "Boron", "AtomicMass": "10.81", "Period": 2, "Group": 13, "Type": "Metalloid", "Phase": "Solid", "ElectronConfiguration": "[He] 2s² 2p¹"},
-        {"AtomicNumber": 6, "Symbol": "C", "Element": "Carbon", "AtomicMass": "12.011", "Period": 2, "Group": 14, "Type": "Reactive Nonmetal", "Phase": "Solid", "ElectronConfiguration": "[He] 2s² 2p²"},
-        {"AtomicNumber": 7, "Symbol": "N", "Element": "Nitrogen", "AtomicMass": "14.007", "Period": 2, "Group": 15, "Type": "Reactive Nonmetal", "Phase": "Gas", "ElectronConfiguration": "[He] 2s² 2p³"},
-        {"AtomicNumber": 8, "Symbol": "O", "Element": "Oxygen", "AtomicMass": "15.999", "Period": 2, "Group": 16, "Type": "Reactive Nonmetal", "Phase": "Gas", "ElectronConfiguration": "[He] 2s² 2p⁴"},
-        {"AtomicNumber": 9, "Symbol": "F", "Element": "Fluorine", "AtomicMass": "18.998", "Period": 2, "Group": 17, "Type": "Reactive Nonmetal", "Phase": "Gas", "ElectronConfiguration": "[He] 2s² 2p⁵"},
-        {"AtomicNumber": 10, "Symbol": "Ne", "Element": "Neon", "AtomicMass": "20.180", "Period": 2, "Group": 18, "Type": "Noble Gas", "Phase": "Gas", "ElectronConfiguration": "[He] 2s² 2p⁶"},
+        {"AtomicNumber": 3, "Symbol": "Li", "Element": "Lithium", "AtomicMass": "6.94", "Period": 2, "Group": 1, "Type": "Alkali Metal", "Phase": "Solid", "Color": "#FFD6A5", "Emoji": "🔋"},
+        {"AtomicNumber": 4, "Symbol": "Be", "Element": "Beryllium", "AtomicMass": "9.0122", "Period": 2, "Group": 2, "Type": "Alkaline Earth", "Phase": "Solid", "Color": "#FFF9A6", "Emoji": "💎"},
+        {"AtomicNumber": 5, "Symbol": "B", "Element": "Boron", "AtomicMass": "10.81", "Period": 2, "Group": 13, "Type": "Metalloid", "Phase": "Solid", "Color": "#CAFFBF", "Emoji": "👁️"},
+        {"AtomicNumber": 6, "Symbol": "C", "Element": "Carbon", "AtomicMass": "12.011", "Period": 2, "Group": 14, "Type": "Nonmetal", "Phase": "Solid", "Color": "#FFADAD", "Emoji": "✏️"},
+        {"AtomicNumber": 7, "Symbol": "N", "Element": "Nitrogen", "AtomicMass": "14.007", "Period": 2, "Group": 15, "Type": "Nonmetal", "Phase": "Gas", "Color": "#FFADAD", "Emoji": "❄️"},
+        {"AtomicNumber": 8, "Symbol": "O", "Element": "Oxygen", "AtomicMass": "15.999", "Period": 2, "Group": 16, "Type": "Nonmetal", "Phase": "Gas", "Color": "#FFADAD", "Emoji": "💨"},
+        {"AtomicNumber": 9, "Symbol": "F", "Element": "Fluorine", "AtomicMass": "18.998", "Period": 2, "Group": 17, "Type": "Halogen", "Phase": "Gas", "Color": "#9BF6FF", "Emoji": "🦷"},
+        {"AtomicNumber": 10, "Symbol": "Ne", "Element": "Neon", "AtomicMass": "20.180", "Period": 2, "Group": 18, "Type": "Noble Gas", "Phase": "Gas", "Color": "#E8AEFF", "Emoji": "🚨"},
         # Periode 3
-        {"AtomicNumber": 11, "Symbol": "Na", "Element": "Sodium", "AtomicMass": "22.990", "Period": 3, "Group": 1, "Type": "Alkali Metal", "Phase": "Solid", "ElectronConfiguration": "[Ne] 3s¹"},
-        {"AtomicNumber": 12, "Symbol": "Mg", "Element": "Magnesium", "AtomicMass": "24.305", "Period": 3, "Group": 2, "Type": "Alkaline Earth Metal", "Phase": "Solid", "ElectronConfiguration": "[Ne] 3s²"},
-        {"AtomicNumber": 13, "Symbol": "Al", "Element": "Aluminum", "AtomicMass": "26.982", "Period": 3, "Group": 13, "Type": "Post-Transition Metal", "Phase": "Solid", "ElectronConfiguration": "[Ne] 3s² 3p¹"},
-        {"AtomicNumber": 14, "Symbol": "Si", "Element": "Silicon", "AtomicMass": "28.085", "Period": 3, "Group": 14, "Type": "Metalloid", "Phase": "Solid", "ElectronConfiguration": "[Ne] 3s² 3p²"},
-        {"AtomicNumber": 15, "Symbol": "P", "Element": "Phosphorus", "AtomicMass": "30.974", "Period": 3, "Group": 15, "Type": "Reactive Nonmetal", "Phase": "Solid", "ElectronConfiguration": "[Ne] 3s² 3p³"},
-        {"AtomicNumber": 16, "Symbol": "S", "Element": "Sulfur", "AtomicMass": "32.06", "Period": 3, "Group": 16, "Type": "Reactive Nonmetal", "Phase": "Solid", "ElectronConfiguration": "[Ne] 3s² 3p⁴"},
-        {"AtomicNumber": 17, "Symbol": "Cl", "Element": "Chlorine", "AtomicMass": "35.45", "Period": 3, "Group": 17, "Type": "Reactive Nonmetal", "Phase": "Gas", "ElectronConfiguration": "[Ne] 3s² 3p⁵"},
-        {"AtomicNumber": 18, "Symbol": "Ar", "Element": "Argon", "AtomicMass": "39.948", "Period": 3, "Group": 18, "Type": "Noble Gas", "Phase": "Gas", "ElectronConfiguration": "[Ne] 3s² 3p⁶"},
-        # Contoh Periode 4 (Kalium & Kalsium)
-        {"AtomicNumber": 19, "Symbol": "K", "Element": "Potassium", "AtomicMass": "39.098", "Period": 4, "Group": 1, "Type": "Alkali Metal", "Phase": "Solid", "ElectronConfiguration": "[Ar] 4s¹"},
-        {"AtomicNumber": 20, "Symbol": "Ca", "Element": "Calcium", "AtomicMass": "40.078", "Period": 4, "Group": 2, "Type": "Alkaline Earth Metal", "Phase": "Solid", "ElectronConfiguration": "[Ar] 4s²"},
+        {"AtomicNumber": 11, "Symbol": "Na", "Value_Na": "Sodium", "Element": "Sodium", "AtomicMass": "22.990", "Period": 3, "Group": 1, "Type": "Alkali Metal", "Phase": "Solid", "Color": "#FFD6A5", "Emoji": "🧂"},
+        {"AtomicNumber": 12, "Symbol": "Mg", "Element": "Magnesium", "AtomicMass": "24.305", "Period": 3, "Group": 2, "Type": "Alkaline Earth", "Phase": "Solid", "Color": "#FFF9A6", "Emoji": "🎆"},
+        {"AtomicNumber": 13, "Symbol": "Al", "Element": "Aluminum", "AtomicMass": "26.982", "Period": 3, "Group": 13, "Type": "Post-Transition Metal", "Phase": "Solid", "Color": "#A0C4FF", "Emoji": "🥤"},
+        {"AtomicNumber": 14, "Symbol": "Si", "Element": "Silicon", "AtomicMass": "28.085", "Period": 3, "Group": 14, "Type": "Metalloid", "Phase": "Solid", "Color": "#CAFFBF", "Emoji": "💻"},
+        {"AtomicNumber": 15, "Symbol": "P", "Element": "Phosphorus", "AtomicMass": "30.974", "Period": 3, "Group": 15, "Type": "Nonmetal", "Phase": "Solid", "Color": "#FFADAD", "Emoji": "Match"},
+        {"AtomicNumber": 16, "Symbol": "S", "Element": "Sulfur", "AtomicMass": "32.06", "Period": 3, "Group": 16, "Type": "Nonmetal", "Phase": "Solid", "Color": "#FFADAD", "Emoji": "🍋"},
+        {"AtomicNumber": 17, "Symbol": "Cl", "Element": "Chlorine", "AtomicMass": "35.45", "Period": 3, "Group": 17, "Type": "Halogen", "Phase": "Gas", "Color": "#9BF6FF", "Emoji": "🏊"},
+        {"AtomicNumber": 18, "Symbol": "Ar", "Element": "Argon", "AtomicMass": "39.948", "Period": 3, "Group": 18, "Type": "Noble Gas", "Phase": "Gas", "Color": "#E8AEFF", "Emoji": "💡"},
+        # Periode 4
+        {"AtomicNumber": 19, "Symbol": "K", "Element": "Potassium", "AtomicMass": "39.098", "Period": 4, "Group": 1, "Type": "Alkali Metal", "Phase": "Solid", "Color": "#FFD6A5", "Emoji": "🍌"},
+        {"AtomicNumber": 20, "Symbol": "Ca", "Element": "Calcium", "AtomicMass": "40.078", "Period": 4, "Group": 2, "Type": "Alkaline Earth", "Phase": "Solid", "Color": "#FFF9A6", "Emoji": "🥛"},
     ]
     return pd.DataFrame(raw_data)
 
+df = load_cute_data()
 
-df = load_local_data()
-
-# Inisialisasi memori jangka pendek (session_state)
 if "selected_element" not in st.session_state:
     st.session_state.selected_element = "Hydrogen"
 
 # ==============================================================================
-# 3. MERENDER GRID TABEL PERIODIK (18 KOLOM)
+# 3. GENERATE GRID KOTAK WARNA-WARNI
 # ==============================================================================
 with st.container():
     cols = st.columns(18)
 
-    # Batasi scan sampai periode 4 untuk data lokal ini
     for period in range(1, 5):
         current_period_df = df[df["Period"] == period]
 
@@ -110,8 +114,23 @@ with st.container():
                     sym = element_row.iloc[0]["Symbol"]
                     num = element_row.iloc[0]["AtomicNumber"]
                     name = element_row.iloc[0]["Element"]
+                    color = element_row.iloc[0]["Color"]
+                    emoji = element_row.iloc[0]["Emoji"]
 
-                    if st.button(f"{num}\n{sym}", key=f"btn_{sym}"):
+                    # Trik Suntik Warna HTML spesifik ke tombol ini menggunakan ID komponen Streamlit
+                    st.markdown(
+                        f"""
+                        <style>
+                        div.stButton > button[key="btn_{sym}"] {{
+                            background-color: {color} !important;
+                        }}
+                        </style>
+                    """,
+                        unsafe_allow_html=True,
+                    )
+
+                    # Tampilkan tombol berformat lucu (Emoji + Simbol)
+                    if st.button(f"{emoji}\n{sym}", key=f"btn_{sym}"):
                         st.session_state.selected_element = name
                 else:
                     st.write("")
@@ -119,35 +138,34 @@ with st.container():
 st.markdown("---")
 
 # ==============================================================================
-# 4. PANEL INFORMASI DETAIL UNSUR YANG TERPILIH
+# 4. KOTAK DETAIL INFORMASI
 # ==============================================================================
-st.header("🔍 Detail Karakteristik Unsur")
-
 selected_name = st.session_state.selected_element
 element_info = df[df["Element"] == selected_name].iloc[0]
 
-# Tampilan Banner Nama Unsur
+# Banner Detail yang Cantik
 st.markdown(
     f"""
-    <div class="element-box">
-        <h2 style='margin:0; color:#FF4B4B;'>{element_info['Element']} ({element_info['Symbol']})</h2>
-        <p style='margin:5px 0 0 0; opacity:0.8;'><b>Kategori:</b> {element_info['Type']} | <b>Wujud Zat (STP):</b> {element_info['Phase']}</p>
+    <div class="detail-card">
+        <h2 style='margin:0; color:#2F3E46;'>{element_info['Emoji']} {element_info['Element']} ({element_info['Symbol']})</h2>
+        <p style='margin:8px 0 0 0; color:#6C757D; font-size:16px;'>
+            <b>Kelompok Unsur:</b> {element_info['Type']} | <b>Wujud Zat:</b> {element_info['Phase']}
+        </p>
     </div>
 """,
     unsafe_allow_html=True,
 )
 
-# Membagi informasi angka menjadi 4 kolom berjejer
+# Statistik Angka Utama
 m_col1, m_col2, m_col3, m_col4 = st.columns(4)
 with m_col1:
-    st.metric(label="Nomor Atom", value=str(element_info["AtomicNumber"]))
+    st.metric(label="🔢 Nomor Atom", value=str(element_info["AtomicNumber"]))
 with m_col2:
-    st.metric(label="Massa Atom", value=f"{element_info['AtomicMass']} u")
+    st.metric(label="⚖️ Massa Atom", value=f"{element_info['AtomicMass']} u")
 with m_col3:
-    st.metric(label="Golongan (Group)", value=str(element_info["Group"]))
+    st.metric(label="↕️ Golongan", value=str(element_info["Group"]))
 with m_col4:
-    st.metric(label="Periode (Period)", value=str(element_info["Period"]))
+    st.metric(label="↔️ Periode", value=str(element_info["Period"]))
 
-# Menampilkan konfigurasi elektron
-st.write("**Konfigurasi Elektron:**")
+st.write("✨ **Konfigurasi Elektron:**")
 st.code(element_info["ElectronConfiguration"], language="bash")
