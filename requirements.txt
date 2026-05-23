@@ -1,2 +1,2 @@
 streamlit
-pandas
+pip install pandas streamlit
