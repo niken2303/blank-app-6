@@ -52,17 +52,41 @@ st.markdown("---")
 
 
 # ==============================================================================
-# 2. MEMUAT DATA DATABASE UNSUR (CACHED)
+# 2. DATA LOKAL (MANDIRI & BEBAS HTTP ERROR)
 # ==============================================================================
 @st.cache_data
-def load_periodic_data():
-    url = "https://gist.github.com/GoodmanSciences/c2c7c06f5b8734b1e994/raw/23304cc5f2ea8b8466e3bfd41d176319213ef301/Periodic%2520Table%2520of%2520Elements.csv"
-    data = pd.read_csv(url)
-    # Mengisi semua nilai kosong (NaN) dengan string strip '-' agar tidak menyebabkan error
-    return data.fillna("-")
+def load_local_data():
+    # Memasukkan data langsung agar aplikasi tidak bergantung pada internet/URL eksternal
+    raw_data = [
+        # Periode 1
+        {"AtomicNumber": 1, "Symbol": "H", "Element": "Hydrogen", "AtomicMass": "1.008", "Period": 1, "Group": 1, "Type": "Reactive Nonmetal", "Phase": "Gas", "ElectronConfiguration": "1s¹"},
+        {"AtomicNumber": 2, "Symbol": "He", "Element": "Helium", "AtomicMass": "4.0026", "Period": 1, "Group": 18, "Type": "Noble Gas", "Phase": "Gas", "ElectronConfiguration": "1s²"},
+        # Periode 2
+        {"AtomicNumber": 3, "Symbol": "Li", "Element": "Lithium", "AtomicMass": "6.94", "Period": 2, "Group": 1, "Type": "Alkali Metal", "Phase": "Solid", "ElectronConfiguration": "[He] 2s¹"},
+        {"AtomicNumber": 4, "Symbol": "Be", "Element": "Beryllium", "AtomicMass": "9.0122", "Period": 2, "Group": 2, "Type": "Alkaline Earth Metal", "Phase": "Solid", "ElectronConfiguration": "[He] 2s²"},
+        {"AtomicNumber": 5, "Symbol": "B", "Element": "Boron", "AtomicMass": "10.81", "Period": 2, "Group": 13, "Type": "Metalloid", "Phase": "Solid", "ElectronConfiguration": "[He] 2s² 2p¹"},
+        {"AtomicNumber": 6, "Symbol": "C", "Element": "Carbon", "AtomicMass": "12.011", "Period": 2, "Group": 14, "Type": "Reactive Nonmetal", "Phase": "Solid", "ElectronConfiguration": "[He] 2s² 2p²"},
+        {"AtomicNumber": 7, "Symbol": "N", "Element": "Nitrogen", "AtomicMass": "14.007", "Period": 2, "Group": 15, "Type": "Reactive Nonmetal", "Phase": "Gas", "ElectronConfiguration": "[He] 2s² 2p³"},
+        {"AtomicNumber": 8, "Symbol": "O", "Element": "Oxygen", "AtomicMass": "15.999", "Period": 2, "Group": 16, "Type": "Reactive Nonmetal", "Phase": "Gas", "ElectronConfiguration": "[He] 2s² 2p⁴"},
+        {"AtomicNumber": 9, "Symbol": "F", "Element": "Fluorine", "AtomicMass": "18.998", "Period": 2, "Group": 17, "Type": "Reactive Nonmetal", "Phase": "Gas", "ElectronConfiguration": "[He] 2s² 2p⁵"},
+        {"AtomicNumber": 10, "Symbol": "Ne", "Element": "Neon", "AtomicMass": "20.180", "Period": 2, "Group": 18, "Type": "Noble Gas", "Phase": "Gas", "ElectronConfiguration": "[He] 2s² 2p⁶"},
+        # Periode 3
+        {"AtomicNumber": 11, "Symbol": "Na", "Element": "Sodium", "AtomicMass": "22.990", "Period": 3, "Group": 1, "Type": "Alkali Metal", "Phase": "Solid", "ElectronConfiguration": "[Ne] 3s¹"},
+        {"AtomicNumber": 12, "Symbol": "Mg", "Element": "Magnesium", "AtomicMass": "24.305", "Period": 3, "Group": 2, "Type": "Alkaline Earth Metal", "Phase": "Solid", "ElectronConfiguration": "[Ne] 3s²"},
+        {"AtomicNumber": 13, "Symbol": "Al", "Element": "Aluminum", "AtomicMass": "26.982", "Period": 3, "Group": 13, "Type": "Post-Transition Metal", "Phase": "Solid", "ElectronConfiguration": "[Ne] 3s² 3p¹"},
+        {"AtomicNumber": 14, "Symbol": "Si", "Element": "Silicon", "AtomicMass": "28.085", "Period": 3, "Group": 14, "Type": "Metalloid", "Phase": "Solid", "ElectronConfiguration": "[Ne] 3s² 3p²"},
+        {"AtomicNumber": 15, "Symbol": "P", "Element": "Phosphorus", "AtomicMass": "30.974", "Period": 3, "Group": 15, "Type": "Reactive Nonmetal", "Phase": "Solid", "ElectronConfiguration": "[Ne] 3s² 3p³"},
+        {"AtomicNumber": 16, "Symbol": "S", "Element": "Sulfur", "AtomicMass": "32.06", "Period": 3, "Group": 16, "Type": "Reactive Nonmetal", "Phase": "Solid", "ElectronConfiguration": "[Ne] 3s² 3p⁴"},
+        {"AtomicNumber": 17, "Symbol": "Cl", "Element": "Chlorine", "AtomicMass": "35.45", "Period": 3, "Group": 17, "Type": "Reactive Nonmetal", "Phase": "Gas", "ElectronConfiguration": "[Ne] 3s² 3p⁵"},
+        {"AtomicNumber": 18, "Symbol": "Ar", "Element": "Argon", "AtomicMass": "39.948", "Period": 3, "Group": 18, "Type": "Noble Gas", "Phase": "Gas", "ElectronConfiguration": "[Ne] 3s² 3p⁶"},
+        # Contoh Periode 4 (Kalium & Kalsium)
+        {"AtomicNumber": 19, "Symbol": "K", "Element": "Potassium", "AtomicMass": "39.098", "Period": 4, "Group": 1, "Type": "Alkali Metal", "Phase": "Solid", "ElectronConfiguration": "[Ar] 4s¹"},
+        {"AtomicNumber": 20, "Symbol": "Ca", "Element": "Calcium", "AtomicMass": "40.078", "Period": 4, "Group": 2, "Type": "Alkaline Earth Metal", "Phase": "Solid", "ElectronConfiguration": "[Ar] 4s²"},
+    ]
+    return pd.DataFrame(raw_data)
 
 
-df = load_periodic_data()
+df = load_local_data()
 
 # Inisialisasi memori jangka pendek (session_state)
 if "selected_element" not in st.session_state:
@@ -74,7 +98,8 @@ if "selected_element" not in st.session_state:
 with st.container():
     cols = st.columns(18)
 
-    for period in range(1, 8):
+    # Batasi scan sampai periode 4 untuk data lokal ini
+    for period in range(1, 5):
         current_period_df = df[df["Period"] == period]
 
         for group in range(1, 19):
@@ -86,10 +111,7 @@ with st.container():
                     num = element_row.iloc[0]["AtomicNumber"]
                     name = element_row.iloc[0]["Element"]
 
-                    # Mengubah format nomor atom menjadi integer yang aman untuk string teks tombol
-                    num_display = int(num) if isinstance(num, (int, float)) else num
-
-                    if st.button(f"{num_display}\n{sym}", key=f"btn_{sym}"):
+                    if st.button(f"{num}\n{sym}", key=f"btn_{sym}"):
                         st.session_state.selected_element = name
                 else:
                     st.write("")
@@ -115,37 +137,16 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Pembersihan format data angka untuk tampilan st.metric agar terhindar dari tipe data pecahan (.0)
-def clean_int(val):
-    try:
-        return str(int(float(val)))
-    except:
-        return str(val)
-
 # Membagi informasi angka menjadi 4 kolom berjejer
 m_col1, m_col2, m_col3, m_col4 = st.columns(4)
 with m_col1:
-    st.metric(label="Nomor Atom", value=clean_int(element_info["AtomicNumber"]))
+    st.metric(label="Nomor Atom", value=str(element_info["AtomicNumber"]))
 with m_col2:
     st.metric(label="Massa Atom", value=f"{element_info['AtomicMass']} u")
 with m_col3:
-    st.metric(label="Golongan (Group)", value=clean_int(element_info["Group"]))
+    st.metric(label="Golongan (Group)", value=str(element_info["Group"]))
 with m_col4:
-    st.metric(label="Periode (Period)", value=clean_int(element_info["Period"]))
-
-# Menampilkan informasi detail sekunder di bagian paling bawah
-st.markdown("### 🧬 Informasi Tambahan")
-info_col1, info_col2 = st.columns(2)
-
-with info_col1:
-    st.write(f"**Radius Atom:** {element_info['AtomicRadius']} Å")
-    st.write(f"**Elektronegativitas:** {element_info['Electronegativity']}")
-    st.write(f"**Titik Leleh:** {element_info['MeltingPoint']} K")
-
-with info_col2:
-    st.write(f"**Titik Didih:** {element_info['BoilingPoint']} K")
-    st.write(f"**Kepadatan (Density):** {element_info['Density']} g/cm³")
-    st.write(f"**Tahun Ditemukan:** {element_info['YearIntroduced']}")
+    st.metric(label="Periode (Period)", value=str(element_info["Period"]))
 
 # Menampilkan konfigurasi elektron
 st.write("**Konfigurasi Elektron:**")
