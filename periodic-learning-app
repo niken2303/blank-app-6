@@ -1,0 +1,13 @@
+periodic-learning-app
+│
+├── app.py
+├── requirements.txt
+├── data
+│   └── elements.csv
+│
+└── pages
+    ├── 1_Materi.py
+    ├── 2_Tabel_Periodik.py
+    ├── 3_Kuis.py
+    ├── 4_Game.py
+    └── 5_Dashboard.py
